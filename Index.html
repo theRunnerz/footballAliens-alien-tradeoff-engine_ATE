@@ -1,0 +1,31 @@
+<div id="app">
+
+  <header>
+    <h1>👽 Football Aliens</h1>
+    <p>Alien Engine — Public Demo</p>
+  </header>
+
+  <section id="wallet">
+    <button id="connectWalletBtn">👽 Connect TronLink</button>
+    <button id="getFbaBtn">🪙 Get FBA</button>
+    <p id="walletStatus"></p>
+    <p id="accessStatus"></p>
+  </section>
+
+  <section id="aliens">
+    <h2>Select Your Alien</h2>
+    <div id="alienGrid">
+      <button class="alien" data-alien="sleep">😴 Sleep Alien</button>
+      <button class="alien lockedAlien" data-alien="coach">🏈 Coach Alien</button>
+      <button class="alien lockedAlien" data-alien="chaos">⚔️ Chaos Alien</button>
+    </div>
+  </section>
+
+  <section id="chat">
+    <h2 id="alienTitle">Choose an Alien</h2>
+    <textarea id="userInput" placeholder="Talk to your alien..." disabled></textarea>
+    <button id="sendBtn" disabled>Send</button>
+    <div id="response"></div>
+  </section>
+
+</div>
