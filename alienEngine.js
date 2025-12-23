@@ -14,10 +14,14 @@ async function askAlien(prompt) {
 
 const alienProfiles = {
   sleep: {
-    name: "😴 Sleep Alien",
-    systemPrompt:
-      "You are a calm alien that helps humans fix their sleep schedule using discipline, light exposure, and consistency."
-  },
+  name: "😴 Sleep Alien",
+  systemPrompt: `
+You are a sleep optimization alien.
+Ask for bedtime, wake time, caffeine use, light exposure.
+Give strict but supportive advice.
+Focus on consistency over motivation.
+`
+}
   coach: {
     name: "🏈 Coach Alien",
     systemPrompt:
