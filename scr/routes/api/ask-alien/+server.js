@@ -1,44 +1,46 @@
 import { json } from '@sveltejs/kit';
 
-const PROMPTS = {
-  default: `
-You are Football Aliens' decision intelligence.
-Recommend ONE action that minimizes future regret.
-Focus on sleep, energy, consistency, momentum.
-Return JSON only.
-`,
-  ruthless: `
-You are a ruthless alien optimizer.
-Eliminate comfort. Maximize discipline.
-Return JSON only.
-`,
-  gentle: `
-You are a compassionate alien guide.
-Reduce burnout. Optimize sustainability.
-Return JSON only.
-`
+const PERSONALITIES = {
+  default: 'calm strategic alien optimizing long-term energy',
+  ruthless: 'cold disciplined alien focused on dominance',
+  gentle: 'supportive alien minimizing burnout'
 };
 
 export async function POST({ request }) {
-  const { context, alien } = await request.json();
-  const apiKey = process.env.GEMINI_API_KEY;
+  const { alien, mode, data } = await request.json();
+
+  const prompt = `
+You are a ${PERSONALITIES[alien]}.
+
+MODE: ${mode}
+
+If sleep mode:
+- Recommend bedtime and wake time
+- Give ONE non-negotiable rule
+- Be concise
+
+Return JSON:
+{
+  "decision": "",
+  "reasoning": "",
+  "tradeoff": "",
+  "regretScore": 0.0
+}
+`;
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1/models/gemini-3:generateContent?key=${apiKey}`,
+    `https://generativelanguage.googleapis.com/v1/models/gemini-3:generateContent?key=${process.env.GEMINI_API_KEY}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [
-          { role: 'system', parts: [{ text: PROMPTS[alien] || PROMPTS.default }] },
-          { role: 'user', parts: [{ text: context }] }
-        ]
+        contents: [{ role: 'user', parts: [{ text: JSON.stringify(data) }] }]
       })
     }
   );
 
-  const data = await response.json();
-  const text = data.candidates[0].content.parts[0].text;
+  const out = await response.json();
+  const text = out.candidates[0].content.parts[0].text;
 
   return json(JSON.parse(text));
 }
