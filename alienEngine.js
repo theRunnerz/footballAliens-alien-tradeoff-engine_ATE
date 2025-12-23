@@ -28,3 +28,23 @@ document.querySelectorAll(".alien").forEach(btn => {
     document.getElementById("sendBtn").disabled = false;
   });
 });
+document.getElementById("sendBtn").addEventListener("click", async () => {
+  const input = document.getElementById("userInput").value;
+  const responseBox = document.getElementById("response");
+
+  if (!currentAlien) return;
+
+  responseBox.innerText = "👽 Thinking...";
+
+  // DEMO RESPONSE (Gemini-style)
+  setTimeout(() => {
+    responseBox.innerText =
+      alienProfiles[currentAlien].systemPrompt +
+      "\n\nAlien says:\n" +
+      generateDemoResponse(input);
+  }, 800);
+});
+
+function generateDemoResponse(input) {
+  return `I hear you say "${input}". Consistency is the key. Return tomorrow.`;
+}
