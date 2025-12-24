@@ -7,8 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
      CONFIG
   ====================== */
   const TRIAL_DAYS = 7;
-  const AI_ENDPOINT =
-    "https://football-aliens-gemini.corb-pratt.workers.dev"; // 👈 your Cloudflare Worker
+  const AI_ENDPOINT = "https://your-worker-subdomain.workers.dev"; // ← update this
 
   /* ======================
      STATE
@@ -74,13 +73,13 @@ document.addEventListener("DOMContentLoaded", () => {
   alienButtons.forEach(btn => {
     btn.onclick = () => {
       selectedAlien = btn.dataset.alien;
-      messages.innerHTML = `<div>👽 <b>${selectedAlien}</b> online</div>`;
+      addSystemMessage(`${selectedAlien} online`);
       enableChat();
     };
   });
 
   /* ======================
-     CHAT UI HELPERS
+     MESSAGE HELPERS
   ====================== */
   function addUserMessage(text) {
     messages.innerHTML += `<div><b>You:</b> ${text}</div>`;
@@ -89,6 +88,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function addAlienMessage(text) {
     messages.innerHTML += `<div><b>${selectedAlien}:</b> ${text}</div>`;
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function addSystemMessage(text) {
+    messages.innerHTML += `<div><i>${text}</i></div>`;
     messages.scrollTop = messages.scrollHeight;
   }
 
@@ -103,31 +107,35 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ======================
-     AI CALL (CLOUDFLARE)
+     TALK TO ALIEN
   ====================== */
   async function talkToAlien(message) {
+    addAlienMessage("👽 listening…");
+
     try {
       const res = await fetch(AI_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message,
-          alien: selectedAlien
-        })
+        body: JSON.stringify({ message, alien: selectedAlien })
       });
 
-      if (!res.ok) throw new Error("AI request failed");
-
       const data = await res.json();
-      addAlienMessage(data.reply || "👽 ...signal lost...");
+
+      if (data.reply) {
+        addAlienMessage(data.reply);
+      } else if (data.debug) {
+        addAlienMessage(`👽 Debug: ${JSON.stringify(data.debug)}`);
+      } else {
+        addAlienMessage("👽 Alien signal lost.");
+      }
     } catch (err) {
-      console.error("❌ AI error:", err);
-      addAlienMessage("👽 Error contacting alien intelligence.");
+      console.error("❌ Talk error:", err);
+      addAlienMessage(`👽 AI core malfunction: ${err.message}`);
     }
   }
 
   /* ======================
-     SEND MESSAGE
+     SEND BUTTON
   ====================== */
   sendBtn.onclick = async () => {
     if (!selectedAlien) {
@@ -140,7 +148,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     addUserMessage(text);
     chatInput.value = "";
-    addAlienMessage("👽 listening…");
 
     await talkToAlien(text);
   };
