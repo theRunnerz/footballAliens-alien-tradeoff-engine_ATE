@@ -1,4 +1,5 @@
 console.log("👽 Alien Engine booting…");
+console.log("Alien Engine loaded");
 
 /* ======================
    CONFIG
@@ -70,18 +71,38 @@ async function hasEnoughFBA() {
 async function checkAccess() {
   const status = document.getElementById("status");
 
-  if (!trialExpired()) {
+  // Force trial init
+  let trialStart = localStorage.getItem("trialStart");
+  if (!trialStart) {
+    trialStart = Date.now().toString();
+    localStorage.setItem("trialStart", trialStart);
+  }
+
+  const daysPassed =
+    (Date.now() - parseInt(trialStart)) / (1000 * 60 * 60 * 24);
+
+  console.log("Trial days passed:", daysPassed.toFixed(2));
+
+  // Still in free trial
+  if (daysPassed < TRIAL_DAYS) {
     enableChat();
-    status.innerText = "🆓 Free Trial Active";
+    status.innerText = `🆓 Free Trial Active (${Math.ceil(
+      TRIAL_DAYS - daysPassed
+    )} days left)`;
     return;
   }
 
+  // Trial expired
   if (!walletAddress) {
-    status.innerText = "Trial ended – connect wallet";
+    disableChat();
+    status.innerText = "⏰ Trial ended — connect wallet";
     return;
   }
+
+  status.innerText = "🔍 Checking FBA balance…";
 
   const allowed = await hasEnoughFBA();
+
   if (allowed) {
     enableChat();
     status.innerText = "✅ FBA Holder Access";
