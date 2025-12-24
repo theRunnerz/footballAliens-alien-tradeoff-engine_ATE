@@ -1,5 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
   // ==============================
+// 7 DAY FREE TRIAL
+// ==============================
+
+const TRIAL_DAYS = 7;
+const TRIAL_KEY = "footballAliensTrialStart";
+
+const now = Date.now();
+let trialStart = localStorage.getItem(TRIAL_KEY);
+
+if (!trialStart) {
+  localStorage.setItem(TRIAL_KEY, now);
+  trialStart = now;
+}
+
+const trialElapsedDays =
+  (now - trialStart) / (1000 * 60 * 60 * 24);
+
+const trialExpired = trialElapsedDays >= TRIAL_DAYS;
+  // ==============================
   // CONFIG
   // ==============================
   const GEMINI_PROXY_URL =
