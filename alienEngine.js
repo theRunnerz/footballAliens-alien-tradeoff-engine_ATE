@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==============================
 
   const TRIAL_DAYS = 7;
-  const TRIAL_KEY = "footballAliensTrialStart";
 
   const FBA_CONTRACT = "TNW5ABkp3v4jfeDo1vRVjxa3gtnoxP3DBN";
   const REQUIRED_FBA = 420;
@@ -17,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentAlien = null;
   let unlockedByToken = false;
+  let walletAddress = null;
 
   // ==============================
   // DOM
@@ -30,24 +30,51 @@ document.addEventListener("DOMContentLoaded", () => {
   const trialNotice = document.getElementById("trialNotice");
 
   // ==============================
-  // TRIAL CHECK
+  // WALLET DETECTION
   // ==============================
 
-  const now = Date.now();
-  let trialStart = localStorage.getItem(TRIAL_KEY);
-
-  if (!trialStart) {
-    localStorage.setItem(TRIAL_KEY, now);
-    trialStart = now;
+  function getWalletAddress() {
+    if (window.tronWeb && tronWeb.defaultAddress.base58) {
+      return tronWeb.defaultAddress.base58;
+    }
+    return "guest";
   }
 
-  const trialElapsedDays =
-    (now - trialStart) / (1000 * 60 * 60 * 24);
+  // ==============================
+  // PER-WALLET TRIAL
+  // ==============================
 
-  const trialExpired = trialElapsedDays >= TRIAL_DAYS;
+  function checkTrial() {
+    walletAddress = getWalletAddress();
+    const trialKey = `footballAliensTrial_${walletAddress}`;
+
+    const now = Date.now();
+    let trialStart = localStorage.getItem(trialKey);
+
+    if (!trialStart) {
+      localStorage.setItem(trialKey, now);
+      trialStart = now;
+    }
+
+    const elapsedDays =
+      (now - trialStart) / (1000 * 60 * 60 * 24);
+
+    const expired = elapsedDays >= TRIAL_DAYS;
+
+    if (expired && !unlockedByToken) {
+      lockApp();
+      trialNotice.innerText =
+        "⏳ Trial ended for this wallet. Hold 420 FBA to unlock.";
+    } else if (!unlockedByToken) {
+      const daysLeft = Math.ceil(TRIAL_DAYS - elapsedDays);
+      trialNotice.innerText =
+        `🆓 Free trial: ${daysLeft} day(s) remaining`;
+      unlockApp(false);
+    }
+  }
 
   // ==============================
-  // WALLET + FBA CHECK
+  // FBA TOKEN CHECK
   // ==============================
 
   async function checkFBABalance() {
@@ -64,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (normalized >= REQUIRED_FBA) {
         unlockedByToken = true;
-        unlockApp();
+        unlockApp(true);
       }
     } catch (err) {
       console.error("FBA check failed", err);
@@ -81,26 +108,15 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.classList.add("locked");
   }
 
-  function unlockApp() {
+  function unlockApp(byToken) {
     document.body.classList.remove("locked");
     userInput.disabled = false;
     sendBtn.disabled = false;
-    trialNotice.innerText =
-      "✅ Access unlocked by holding 420 FBA";
-  }
 
-  // ==============================
-  // INITIAL ACCESS STATE
-  // ==============================
-
-  if (trialExpired) {
-    lockApp();
-    trialNotice.innerText =
-      "⏳ Trial ended. Hold 420 FBA tokens to continue.";
-  } else {
-    const daysLeft = Math.ceil(TRIAL_DAYS - trialElapsedDays);
-    trialNotice.innerText =
-      `🆓 Free trial: ${daysLeft} day(s) remaining`;
+    if (byToken) {
+      trialNotice.innerText =
+        "✅ Access unlocked by holding 420 FBA";
+    }
   }
 
   // ==============================
@@ -152,16 +168,16 @@ document.addEventListener("DOMContentLoaded", () => {
   function localAlienReply(alien) {
     switch (alien) {
       case "sleep":
-        return "😴 Sleep Alien: Fixed wake time. Morning light. No excuses.";
+        return "😴 Sleep Alien: Same wake time. Morning light. No negotiation.";
 
       case "coach":
-        return "🏈 Coach Alien: You don’t need motivation. You need discipline.";
+        return "🏈 Coach Alien: Discipline beats motivation. Execute.";
 
       case "chaos":
-        return "⚔️ Chaos Alien: Comfort is the enemy. Choose violence against bad habits.";
+        return "⚔️ Chaos Alien: Comfort is why you’re stuck. Burn it.";
 
       default:
-        return "👽 The alien observes.";
+        return "👽 The alien watches.";
     }
   }
 
@@ -175,9 +191,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ==============================
-  // AUTO CHECK AFTER WALLET CONNECT
+  // INIT
   // ==============================
 
-  setTimeout(checkFBABalance, 1500);
+  setTimeout(() => {
+    checkTrial();
+    checkFBABalance();
+  }, 1500);
 
 });
