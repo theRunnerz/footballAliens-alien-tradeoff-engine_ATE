@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
      CONFIG
   ====================== */
   const TRIAL_DAYS = 7;
-  const AI_ENDPOINT = "https://your-worker-subdomain.workers.dev"; // ← update this
+  const AI_ENDPOINT = "https://football-aliens-gemini.corb-pratt.workers.dev/"; // ← update this
 
   /* ======================
      STATE
