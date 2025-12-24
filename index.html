@@ -1,34 +1,58 @@
-<div id="app">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Football Aliens — Alien Engine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
 
-  <header>
-    <h1>👽 Football Aliens</h1>
-    <p>Alien Engine — Public Demo</p>
-  </header>
+  <h1>👽 Football Aliens</h1>
+  <h2>Alien Engine — Public Demo</h2>
 
-  <section id="wallet">
-    <button id="connectWalletBtn">👽 Connect TronLink</button>
-    <button id="getFbaBtn">🪙 Get FBA</button>
-    <p id="walletStatus"></p>
-    <p id="accessStatus"></p>
-  </section>
+  <!-- Wallet Actions -->
+  <div style="margin-bottom: 15px;">
+    <button id="connectWallet">👽 Connect TronLink</button>
+    <button id="getFBA">🪙 Get FBA</button>
+  </div>
 
-  <section id="aliens">
-    <h2>Select Your Alien</h2>
-    <div id="alienGrid">
-      <button class="alien" data-alien="sleep">😴 Sleep Alien</button>
-      <p>😴 Fix your sleep schedule with alien discipline.</p>
-      <button class="alien lockedAlien" data-alien="coach">🏈 Coach Alien</button>
-      <button class="alien lockedAlien" data-alien="chaos">⚔️ Chaos Alien</button>
-    </div>
-  </section>
+  <!-- Trial Notice -->
+  <div id="trialNotice" style="margin:10px 0; color:#c00; font-weight:bold;"></div>
 
-  <section id="chat">
-    <h2 id="alienTitle">Choose an Alien</h2>
-    <textarea id="userInput" placeholder="Talk to your alien..." disabled></textarea>
+  <hr />
+
+  <!-- Alien Selection -->
+  <h3>Select Your Alien</h3>
+
+  <button class="alien" data-alien="sleep">😴 Sleep Alien</button>
+  <p>😴 Fix your sleep schedule with alien discipline.</p>
+
+  <button class="alien" data-alien="coach">🏈 Coach Alien</button>
+  <button class="alien" data-alien="chaos">⚔️ Chaos Alien</button>
+
+  <hr />
+
+  <!-- Active Alien -->
+  <h3 id="alienTitle">No Alien Selected</h3>
+
+  <!-- Chat -->
+  <div id="chat">
+    <textarea
+      id="userInput"
+      rows="3"
+      placeholder="Talk to your alien..."
+      disabled
+    ></textarea>
+    <br />
     <button id="sendBtn" disabled>Send</button>
-    <div id="response"></div>
-  </section>
-<script src="https://cdn.jsdelivr.net/npm/tronweb/dist/TronWeb.js"></script>
-<script src="./wallet.js"></script>
-<script src="./alienEngine.js"></script>
-</div>
+  </div>
+
+  <p id="response" style="margin-top:10px;"></p>
+
+  <!-- Scripts -->
+  <script src="wallet.js"></script>
+  <script src="alienEngine.js"></script>
+
+</body>
+</html>
