@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   getFBABtn.onclick = () => {
     console.log("🪙 Get FBA clicked");
-    window.open("https://sunpump.meme", "_blank");
+    window.open("https://sunpump.meme/token/TNW5ABkp3v4jfeDo1vRVjxa3gtnoxP3DBN", "_blank");
   };
 
   /* ======================
