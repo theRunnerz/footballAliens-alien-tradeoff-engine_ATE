@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ====================== */
   const TRIAL_DAYS = 7;
   const AI_ENDPOINT =
-    "https://football-alien-gemini.corb-pratt.workers.dev"; // 👈 your Cloudflare Worker
+    "https://football-aliens-gemini.corb-pratt.workers.dev"; // 👈 your Cloudflare Worker
 
   /* ======================
      STATE
