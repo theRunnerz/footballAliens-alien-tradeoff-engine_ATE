@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
      CONFIG
   ====================== */
   const TRIAL_DAYS = 7;
+  const AI_ENDPOINT =
+    "https://football-alien-gemini.corb-pratt.workers.dev"; // 👈 your Cloudflare Worker
 
   /* ======================
      STATE
@@ -25,8 +27,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const messages = document.getElementById("messages");
   const alienButtons = document.querySelectorAll("#aliens button");
 
-  // HARD CHECK — if this fails, nothing works
-  if (!statusEl || !connectBtn || !getFBABtn) {
+  if (
+    !statusEl ||
+    !connectBtn ||
+    !getFBABtn ||
+    !chatInput ||
+    !sendBtn ||
+    !messages
+  ) {
     console.error("❌ Critical DOM elements missing");
     return;
   }
@@ -54,7 +62,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   getFBABtn.onclick = () => {
     console.log("🪙 Get FBA clicked");
-    window.open("https://sunpump.meme/token/TNW5ABkp3v4jfeDo1vRVjxa3gtnoxP3DBN", "_blank");
+    window.open(
+      "https://sunpump.meme/token/TNW5ABkp3v4jfeDo1vRVjxa3gtnoxP3DBN",
+      "_blank"
+    );
   };
 
   /* ======================
@@ -63,27 +74,23 @@ document.addEventListener("DOMContentLoaded", () => {
   alienButtons.forEach(btn => {
     btn.onclick = () => {
       selectedAlien = btn.dataset.alien;
-      console.log("👽 Selected alien:", selectedAlien);
-      messages.innerHTML = `<div>👽 ${selectedAlien} online</div>`;
+      messages.innerHTML = `<div>👽 <b>${selectedAlien}</b> online</div>`;
+      enableChat();
     };
   });
 
   /* ======================
-     CHAT
+     CHAT UI HELPERS
   ====================== */
-  sendBtn.onclick = () => {
-    if (!selectedAlien) {
-      alert("Select an alien first");
-      return;
-    }
-
-    const text = chatInput.value.trim();
-    if (!text) return;
-
+  function addUserMessage(text) {
     messages.innerHTML += `<div><b>You:</b> ${text}</div>`;
-    messages.innerHTML += `<div><b>${selectedAlien}:</b> 👽 listening…</div>`;
-    chatInput.value = "";
-  };
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function addAlienMessage(text) {
+    messages.innerHTML += `<div><b>${selectedAlien}:</b> ${text}</div>`;
+    messages.scrollTop = messages.scrollHeight;
+  }
 
   function enableChat() {
     chatInput.disabled = false;
@@ -96,36 +103,77 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ======================
-     TRIAL LOGIC (BULLETPROOF)
+     AI CALL (CLOUDFLARE)
+  ====================== */
+  async function talkToAlien(message) {
+    try {
+      const res = await fetch(AI_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message,
+          alien: selectedAlien
+        })
+      });
+
+      if (!res.ok) throw new Error("AI request failed");
+
+      const data = await res.json();
+      addAlienMessage(data.reply || "👽 ...signal lost...");
+    } catch (err) {
+      console.error("❌ AI error:", err);
+      addAlienMessage("👽 Error contacting alien intelligence.");
+    }
+  }
+
+  /* ======================
+     SEND MESSAGE
+  ====================== */
+  sendBtn.onclick = async () => {
+    if (!selectedAlien) {
+      alert("Select an alien first");
+      return;
+    }
+
+    const text = chatInput.value.trim();
+    if (!text) return;
+
+    addUserMessage(text);
+    chatInput.value = "";
+    addAlienMessage("👽 listening…");
+
+    await talkToAlien(text);
+  };
+
+  /* ======================
+     TRIAL LOGIC
   ====================== */
   function checkAccess() {
-    console.log("🕒 Checking trial status");
-
     let trialStart = localStorage.getItem("trialStart");
 
     if (!trialStart) {
       trialStart = Date.now();
       localStorage.setItem("trialStart", trialStart);
-      console.log("🆕 Trial initialized");
     }
 
     const daysPassed =
-      (Date.now() - parseInt(trialStart)) / (1000 * 60 * 60 * 24);
-
-    console.log("📅 Days passed:", daysPassed);
+      (Date.now() - parseInt(trialStart, 10)) / (1000 * 60 * 60 * 24);
 
     if (daysPassed < TRIAL_DAYS) {
-      enableChat();
       statusEl.innerText = `🆓 Free Trial Active (${Math.ceil(
         TRIAL_DAYS - daysPassed
       )} days left)`;
+      enableChat();
     } else {
+      statusEl.innerText =
+        "⏰ Trial ended — hold 420 FBA to continue";
       disableChat();
-      statusEl.innerText = "⏰ Trial ended — connect wallet";
     }
   }
 
-  // INIT
+  /* ======================
+     INIT
+  ====================== */
   disableChat();
   checkAccess();
 });
