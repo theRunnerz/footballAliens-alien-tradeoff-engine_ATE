@@ -115,11 +115,35 @@ function sendMessage() {
 
   if (!input.value.trim()) return;
 
-  messages.innerHTML += `<div><b>You:</b> ${input.value}</div>`;
-  messages.innerHTML += `<div><b>${selectedAlien}:</b> 👽 *alien response*</div>`;
-
+  const userText = input.value;
   input.value = "";
+
+  messages.innerHTML += `<div><b>You:</b> ${userText}</div>`;
+  messages.innerHTML += `<div><b>${selectedAlien}:</b> 👽 typing...</div>`;
+
+  try {
+    const res = await fetch(
+      "https://football-aliens-gemini.yourname.workers.dev",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          alien: selectedAlien,
+          message: userText
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    messages.lastChild.innerHTML = `<b>${selectedAlien}:</b> ${data.reply}`;
+  } catch (err) {
+    messages.lastChild.innerHTML =
+      `<b>${selectedAlien}:</b> ❌ Transmission failed`;
+    console.error(err);
+  }
 }
+
 
 /* ======================
    ALIENS
