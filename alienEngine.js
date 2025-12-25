@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 🔥 IMPORTANT: base URL ONLY (no /api here)
   const BACKEND_URL =
-    "https://football-aliens-ai-backend-e3gj-pm4j9cgy3-runnerzs-projects.vercel.app";
+    "https://football-aliens-ai-backend-b6k1-evlvnp5rq-runnerzs-projects.vercel.app";
 
   /* ======================
      STATE
