@@ -9,7 +9,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const TRIAL_DAYS = 7;
   const FBA_TOKEN_ADDRESS = "TNW5ABkp3v4jfeDo1vRVjxa3gtnoxP3DBN";
   const FBA_REQUIRED = 420;
-  const BACKEND_URL = "https://football-aliens-ai-backend-e3gj-pm4j9cgy3-runnerzs-projects.vercel.app";
+
+  // 🔥 IMPORTANT: base URL ONLY (no /api here)
+  const BACKEND_URL =
+    "https://football-aliens-ai-backend-e3gj-pm4j9cgy3-runnerzs-projects.vercel.app";
 
   /* ======================
      STATE
@@ -92,21 +95,31 @@ document.addEventListener("DOMContentLoaded", () => {
     await talkToAlien(userMessage, selectedAlien);
   };
 
+  /* ======================
+     TALK TO ALIEN (FIXED)
+  ====================== */
   async function talkToAlien(message, alien) {
     try {
-      const res = await fetch(BACKEND_URL, {
+      const res = await fetch(`${BACKEND_URL}/api/alien`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, alien })
+        body: JSON.stringify({
+          prompt: `${alien} persona. Respond fully in character.\nHuman: ${message}`
+        })
       });
 
-      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      if (!res.ok) {
+        throw new Error(`Server returned ${res.status}`);
+      }
 
       const data = await res.json();
-      messages.innerHTML += `<div><b>${alien}:</b> ${data.reply}</div>`;
+
+      messages.innerHTML += `<div><b>${alien}:</b> ${
+        data.reply || "👽 Alien signal lost."
+      }</div>`;
     } catch (err) {
       console.error("❌ Talk error:", err);
-      messages.innerHTML += `<div><b>${alien}:</b> 👽 AI core malfunction: ${err.message}</div>`;
+      messages.innerHTML += `<div><b>${alien}:</b> 👽 AI core malfunction</div>`;
     }
   }
 
@@ -127,6 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("🕒 Checking trial / FBA status");
 
     let trialStart = localStorage.getItem("trialStart");
+
     if (!trialStart) {
       trialStart = Date.now();
       localStorage.setItem("trialStart", trialStart);
@@ -151,14 +165,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const balance = await window.tronWeb.trx.getTokenBalance(FBA_TOKEN_ADDRESS, walletAddress);
+      const balance = await window.tronWeb.trx.getTokenBalance(
+        FBA_TOKEN_ADDRESS,
+        walletAddress
+      );
 
       if (parseInt(balance) >= FBA_REQUIRED) {
         enableChat();
         statusEl.innerText = "🛸 Access granted — FBA tokens verified";
       } else {
         disableChat();
-        statusEl.innerText = "⏰ Trial ended — hold 420 FBA tokens to continue";
+        statusEl.innerText =
+          "⏰ Trial ended — hold 420 FBA tokens to continue";
       }
     } catch (err) {
       console.error("❌ Token check failed:", err);
@@ -167,7 +185,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // INIT
+  /* ======================
+     INIT
+  ====================== */
   disableChat();
   checkAccess();
 });
