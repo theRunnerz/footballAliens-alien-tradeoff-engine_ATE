@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
      CONFIG
   ====================== */
   const TRIAL_DAYS = 7;
-  const AI_ENDPOINT = "https://football-aliens-ai-backend-pptkqgqlx-runnerzs-projects.vercel.app/api/alien.js";
+  const AI_ENDPOINT = "https://football-aliens-ai-backend-4uqbdukxy-runnerzs-projects.vercel.app/api/alien.js";
 
 
   /* ======================
