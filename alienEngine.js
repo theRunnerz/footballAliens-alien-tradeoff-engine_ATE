@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const TRIAL_DAYS = 7;
   const FBA_TOKEN_ADDRESS = "TNW5ABkp3v4jfeDo1vRVjxa3gtnoxP3DBN";
   const FBA_REQUIRED = 420;
-  const BACKEND_URL = "https://football-aliens-ai-backend-e3gj-7rv1paro0-runnerzs-projects.vercel.app/api/alien";
+  const BACKEND_URL = "https://football-aliens-ai-backend-e3gj-c6y23po7l-runnerzs-projects.vercel.app/api/alien";
 
   /* ======================
      STATE
