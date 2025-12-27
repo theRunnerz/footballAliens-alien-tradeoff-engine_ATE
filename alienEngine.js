@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const TRIAL_DAYS = 7;
   const FBA_TOKEN_ADDRESS = "TNW5ABkp3v4jfeDo1vRVjxa3gtnoxP3DBN";
   const FBA_REQUIRED = 420;
-  const BACKEND_URL = "https://football-aliens-ai-backend-e3gj-7l0ghqxll-runnerzs-projects.vercel.app/api/alien";
+  const BACKEND_URL = "https://football-aliens-ai-backend-e3gj-crgidy6bs-runnerzs-projects.vercel.app/api/alien";
 
   /* ======================
      STATE
@@ -108,17 +108,15 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const res = await fetch(BACKEND_URL, {
         method: "POST",
-        mode: "cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message, alien })
       });
 
-      if (!res.ok) {
-        throw new Error(`Server returned ${res.status}`);
-      }
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
 
       const data = await res.json();
-      // Remove the "listening…" placeholder
+
+      // Remove "listening…" placeholder
       const lastAlienMsg = messages.querySelector(".alien-msg:last-child");
       if (lastAlienMsg && lastAlienMsg.textContent.includes("listening…")) {
         lastAlienMsg.remove();
