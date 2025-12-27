@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.onclick = () => {
       selectedAlien = btn.dataset.alien;
       console.log("👽 Selected alien:", selectedAlien);
-      messages.innerHTML = `<div>👽 ${selectedAlien} online</div>`;
+      messages.innerHTML += `<div>👽 ${selectedAlien} online</div>`;
     };
   });
 
@@ -85,12 +85,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const userMessage = chatInput.value.trim();
     if (!userMessage) return;
 
-    messages.innerHTML += `<div><b>You:</b> ${userMessage}</div>`;
-    messages.innerHTML += `<div><b>${selectedAlien}:</b> 👽 listening…</div>`;
+    appendMessage("human", userMessage);
+    appendMessage("alien", `${selectedAlien} 👽 listening…`);
     chatInput.value = "";
 
     await talkToAlien(userMessage, selectedAlien);
   };
+
+  chatInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendBtn.click();
+  });
+
+  function appendMessage(sender, text) {
+    const msgEl = document.createElement("div");
+    msgEl.className = sender === "human" ? "human-msg" : "alien-msg";
+    msgEl.innerHTML = text;
+    messages.appendChild(msgEl);
+    messages.scrollTop = messages.scrollHeight;
+  }
 
   async function talkToAlien(message, alien) {
     try {
@@ -100,24 +112,22 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ message, alien })
       });
 
-      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      if (!res.ok) {
+        throw new Error(`Server returned ${res.status}`);
+      }
 
       const data = await res.json();
-      messages.innerHTML += `<div><b>${alien}:</b> ${data.reply}</div>`;
+      // Remove the "listening…" placeholder
+      const lastAlienMsg = messages.querySelector(".alien-msg:last-child");
+      if (lastAlienMsg && lastAlienMsg.textContent.includes("listening…")) {
+        lastAlienMsg.remove();
+      }
+
+      appendMessage("alien", `<b>${alien}:</b> ${data.reply || "👽 Alien brain static."}`);
     } catch (err) {
       console.error("❌ Talk error:", err);
-      messages.innerHTML += `<div><b>${alien}:</b> 👽 AI core malfunction: ${err.message}</div>`;
+      appendMessage("alien", `<b>${alien}:</b> ❌ Failed to connect: ${err.message}`);
     }
-  }
-
-  function enableChat() {
-    chatInput.disabled = false;
-    sendBtn.disabled = false;
-  }
-
-  function disableChat() {
-    chatInput.disabled = true;
-    sendBtn.disabled = true;
   }
 
   /* ======================
@@ -165,6 +175,16 @@ document.addEventListener("DOMContentLoaded", () => {
       disableChat();
       statusEl.innerText = "⚠️ Could not verify FBA tokens";
     }
+  }
+
+  function enableChat() {
+    chatInput.disabled = false;
+    sendBtn.disabled = false;
+  }
+
+  function disableChat() {
+    chatInput.disabled = true;
+    sendBtn.disabled = true;
   }
 
   // INIT
