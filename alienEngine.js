@@ -1,6 +1,6 @@
 // alienEngine.js — Football Aliens AI Engine
 const PROXY_URL =
-  "https://football-aliens-proxy-cidq0bs3d-runnerzs-projects.vercel.app/api/alien";
+  "https://football-aliens-proxy-67re77820-runnerzs-projects.vercel.app/api/alien";
 
 let selectedAlien = "Zorg";
 
