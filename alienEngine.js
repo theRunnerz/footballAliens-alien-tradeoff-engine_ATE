@@ -1,61 +1,43 @@
-// alienEngine.js v4.3.0
-console.log("👽 Alien Engine loaded");
-
+// alienEngine.js — Football Aliens AI Engine
 const PROXY_URL =
   "https://football-aliens-proxy-cidq0bs3d-runnerzs-projects.vercel.app/api/alien";
 
 let selectedAlien = "Zorg";
 
-// -------------------------
-// Alien selection
-// -------------------------
-document.querySelectorAll(".alien-card").forEach((card) => {
-  card.addEventListener("click", () => {
-    selectedAlien = card.dataset.alien;
+// Alien selector buttons
+document.querySelectorAll(".alien-btn").forEach((btn) => {
+  btn.onclick = () => {
+    selectedAlien = btn.dataset.alien;
     console.log("👽 Selected alien:", selectedAlien);
-
-    document.querySelectorAll(".alien-card").forEach((c) =>
-      c.classList.remove("selected")
-    );
-    card.classList.add("selected");
-  });
+  };
 });
 
-// -------------------------
 // Talk to alien
-// -------------------------
 async function talkToAlien(message) {
-  console.log("🛸 Talking to alien:", selectedAlien);
-
   try {
-    const response = await fetch(PROXY_URL, {
+    const res = await fetch(PROXY_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         message,
         alien: selectedAlien,
       }),
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+    const data = await res.json();
+
+    if (!data.reply) {
+      throw new Error("No reply from alien");
     }
 
-    const data = await response.json();
-    console.log("👽 Alien reply:", data.reply);
-
-    return data.reply || "👽 Alien is silent…";
+    return data.reply;
   } catch (err) {
-    console.error("❌ Alien talk failed:", err);
-    return "👽 Signal lost in deep space…";
+    console.error("❌ Talk error:", err);
+    return "👽 Transmission failed. Try again.";
   }
 }
 
-// -------------------------
-// UI wiring
-// -------------------------
+// UI hookup
 const sendBtn = document.getElementById("sendBtn");
 const input = document.getElementById("alienInput");
 const output = document.getElementById("alienOutput");
@@ -64,9 +46,8 @@ sendBtn.onclick = async () => {
   const message = input.value.trim();
   if (!message) return;
 
-  output.textContent = "🧠 Thinking...";
-  input.value = "";
-
+  output.innerText = "👽 Thinking...";
   const reply = await talkToAlien(message);
-  output.textContent = reply;
+  output.innerText = reply;
 };
+
